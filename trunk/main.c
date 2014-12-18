@@ -128,25 +128,33 @@ main (int argc, char **argv)
   }
 
   /* check if plot was requested and generate it if yes */
-  if (gpt != NULL && n > 1) { 
+  if (gpt != NULL && n > 1)
+  { 
     FILE *gpf = fopen (gpt, "w");
     int i;
     double dx;
-		if( fromX == 0 && toX == 0 ) { /* calculate plot range if it was not specified */
-			if( pts.n > 1 ) {
+		if( fromX == 0 && toX == 0 ) 
+		{				 /* calculate plot range if it was not specified */
+			if( pts.n > 1 ) 
+			{
 				fromX= pts.x[0];
 				toX=   pts.x[pts.n-1];
-			} else if( spl.n > 1 ) {
+			} 
+			else if( spl.n > 1 ) 
+			{
 				fromX= spl.x[0];
 				toX=   spl.x[spl.n-1];
-			} else {
+			}
+			else 
+			{
 				fromX= 0;
 				toX= 1;
 			}
 		}
     dx = (toX - fromX) / (n - 1);
 
-    if (gpf == NULL) {
+    if (gpf == NULL)
+    {
       fprintf (stderr, "%s: can not write gnuplot file: %s\n\n", argv[0],
                gpt);
       exit (EXIT_FAILURE);
