@@ -7,8 +7,8 @@ intrp: main.o splines.o points.o interpolator.o gaus/libge.a
 prosta: main.o splines.o points.o prosta.o
 	$(CC) -o prosta  main.o splines.o points.o prosta.o	
 
-legendre: main.o splines.o points.o apro_legendre.o gaus/libge.a
-	$(CC) -o legendre  main.o splines.o points.o apro_legendre.o -L gaus -l ge
+legendre: main.o splines.o points.o legendre.o gaus/libge.a
+	$(CC) -o legendre  main.o splines.o points.o legendre.o -L gaus -l ge
 
 aproksymator_na_bazie.o: makespl.h points.h gaus/piv_ge_solver.h
 	$(CC) -I gaus -c aproksymator_na_bazie.c
@@ -16,8 +16,8 @@ aproksymator_na_bazie.o: makespl.h points.h gaus/piv_ge_solver.h
 interpolator.o: makespl.h points.h gaus/piv_ge_solver.h
 	$(CC) -I gaus -c interpolator.c
 
-apro_legendre.o: makespl.h points.h gaus/piv_ge_solver.h
-	$(CC) -I gaus -c apro_legendre.c
+legendre.o: makespl.h points.h gaus/piv_ge_solver.h
+	$(CC) -I gaus -c legendre.c
 
 .PHONY: clean
 

@@ -5,22 +5,22 @@
 #include <stdlib.h>
 #include <float.h>
 
-double P0 ()
+static double P0 ()
 {
 	return 1;
 }
 
-double P1 (double x)
+static double P1 (double x)
 {
 	return x;
 }
 
-double P2 (double x)
+static double P2 (double x)
 {
 	return ( 3*x*x - 1 ) /2;
 }
 
-double P3 (double x)
+static double P3 (double x)
 {
 	return ( 5*x*x*x - 3*x ) /2;
 }
@@ -131,5 +131,8 @@ make_spl (points_t * pts, spline_t * spl)
 		spl->f2[0] = 3 * ( a2 + 5 * a3 * xx );
 		spl->f3[0] = 15 * a3;
 	}
+free (eqs->e);
 free (eqs);
+free (x);
+free (y);
 }
