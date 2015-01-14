@@ -166,6 +166,10 @@ main (int argc, char **argv)
 
     fclose (gpf);
   }
-
-  return 0;
+	free (spl.x);
+	free (spl.f);
+	free (spl.f1);
+	free (spl.f2);
+	free (spl.f3);
+	return 0;
 }
