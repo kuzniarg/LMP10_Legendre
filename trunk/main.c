@@ -26,7 +26,7 @@ char *usage =
 int
 main (int argc, char **argv)
 {
-	int opt;
+	int opt, czy_pts=0, czy_spl=0;
 	char *inp = NULL;
 	char *out = NULL;
 	char *gpt = NULL;
@@ -92,28 +92,29 @@ main (int argc, char **argv)
 		}
 
 		if (read_pts_failed (inf, &pts))
-		{
+		{	
+			fclose (inf);
 			fprintf (stderr, "%s: bad contents of points file: %s\n\n", argv[0], inp);
 			exit (EXIT_FAILURE);
 		}
 		else
 			fclose (inf);
 
+		if (out == NULL)
+			{
+			free (pts.x);
+			free (pts.y);
+			fprintf (stderr, "%s: can not write spline file: (null)\n\n", argv[0]);
+			exit (EXIT_FAILURE);
+			}
+		
 		ouf = fopen (out, "w");
 		if (ouf == NULL)
 		{
 			free (pts.x);
 			free (pts.y);
-			if (out != NULL)
-			{
-				fprintf (stderr, "%s: can not write spline file: %s\n\n", argv[0], out);
-				exit (EXIT_FAILURE);
-			}
-			else 
-			{
-				fprintf (stderr, "%s: can not write spline file: <empty>\n\n", argv[0]);
-				exit (EXIT_FAILURE);
-			}
+			fprintf (stderr, "%s: can not write spline file: %s\n\n", argv[0], out);
+			exit (EXIT_FAILURE);
 		}
 
 		make_spl (&pts, &spl);
@@ -122,6 +123,8 @@ main (int argc, char **argv)
 			write_spl (&spl, ouf);
 
 		fclose (ouf);
+		czy_pts=1;
+		czy_spl=1;
 	}
 	else if (out != NULL) /* if point-file was NOT given, try to read splines from a file */
 	{    
@@ -133,10 +136,12 @@ main (int argc, char **argv)
     	}
 		if (read_spl (splf, &spl))
 		{
+			fclose(splf);
 			fprintf (stderr, "%s: bad contents of spline file: %s\n\n", argv[0], inp);
 			exit (EXIT_FAILURE);
 	    }
 		fclose (splf);
+		czy_spl=1;
 	}
 	else /* ponts were not given nor spline was given -> it is an error */
     {
@@ -145,9 +150,14 @@ main (int argc, char **argv)
 	}
 
 	if (spl.n < 1) /* check if there is a valid spline */
-    {
+	{
+		if (czy_pts == 1)
+			{
+				free (pts.x);
+				free (pts.y);
+			}
 		fprintf (stderr, "%s: bad spline: n=%d\n\n", argv[0], spl.n);
-    	exit (EXIT_FAILURE);
+		exit (EXIT_FAILURE);
 	}
 
 	/* check if plot was requested and generate it if yes */
@@ -178,6 +188,19 @@ main (int argc, char **argv)
 
 		if (gpf == NULL)
 		{
+			if (czy_pts == 1)
+			{
+				free (pts.x);
+				free (pts.y);
+			}
+			if (czy_spl == 1)
+			{
+				free (spl.x);
+				free (spl.f);
+				free (spl.f1);
+				free (spl.f2);
+				free (spl.f3);
+			}
 			fprintf (stderr, "%s: can not write gnuplot file: %s\n\n", argv[0], gpt);
 			exit (EXIT_FAILURE);
 		}
@@ -187,10 +210,18 @@ main (int argc, char **argv)
 
 		fclose (gpf);
 	}
-	free (spl.x);
-	free (spl.f);
-	free (spl.f1);
-	free (spl.f2);
-	free (spl.f3);
+	if (czy_spl == 1)
+	{
+		free (spl.x);
+		free (spl.f);
+		free (spl.f1);
+		free (spl.f2);
+		free (spl.f3);
+	}
+	if (czy_pts == 1)
+	{
+		free (pts.x);
+		free (pts.y);
+	}
 	return 0;
 }

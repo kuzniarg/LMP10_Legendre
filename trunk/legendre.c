@@ -36,7 +36,7 @@ make_spl (points_t * pts, spline_t * spl)
 	int nb = 4; 
 	double suma = 0;
 	double a0, a1, a2, a3, xx;
-
+	
 	eqs = make_matrix (nb, nb + 1);
 
 
@@ -131,8 +131,7 @@ make_spl (points_t * pts, spline_t * spl)
 		spl->f2[0] = 3 * ( a2 + 5 * a3 * xx );
 		spl->f3[0] = 15 * a3;
 	}
-free (eqs->e);
-free (eqs);
-free (x);
-free (y);
+
+	free (eqs->e);
+	free (eqs);
 }
