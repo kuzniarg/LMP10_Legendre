@@ -5,24 +5,20 @@
 #include <stdlib.h>
 #include <float.h>
 
-static double P0 ()
+static double P (int n, double x)
 {
-	return 1;
+	if (n==0) return 1;
+	else if (n==1) return x;
+	else if (n==2) return ( 3*x*x - 1 ) /2;
+	else if (n==3) return ( 5*x*x*x - 3*x ) /2;
 }
 
-static double P1 (double x)
+static double wartosc (int i, int j, double x)
 {
-	return x;
-}
-
-static double P2 (double x)
-{
-	return ( 3*x*x - 1 ) /2;
-}
-
-static double P3 (double x)
-{
-	return ( 5*x*x*x - 3*x ) /2;
+	if ( i==0 || j==0 )
+		return (P (i, x) * P (j, x));
+	else
+		return (2 * P (i, x) * P (j, x));
 }
 
 void
@@ -47,51 +43,7 @@ make_spl (points_t * pts, spline_t * spl)
 			suma = 0;
 			for (k = 0; k < pts->n; k++)
 			{
-				if (i==0)
-				{	
-					if (j==0)
-						suma += P0();
-					else if (j==1)
-						suma += P1(x[k]);
-					else if (j==2)
-						suma += P2(x[k]);
-					else if (j==3)
-						suma += P3(x[k]);
-				}
-				else if (i==1)
-				{
-					if (j==0)
-						suma += P1(x[k]);
-					if (j==1)
-						suma += 2 * P1(x[k]) * P1(x[k]);
-					if (j==2)
-						suma += 2 * P1(x[k]) * P2(x[k]);
-					if (j==3)
-						suma += 2 * P1(x[k]) * P3(x[k]);
-				}
-				else if (i==2)
-				{
-					if (j==0)
-						suma += P2(x[k]);
-					if (j==1)
-						suma += 2 * P2(x[k]) * P1(x[k]);
-					if (j==2)
-						suma += 2 * P2(x[k]) * P2(x[k]);
-					if (j==3)
-						suma += 2 * P2(x[k]) * P3(x[k]);
-				}
-				else if (i==3)
-				{
-					if (j==0)
-						suma += P3(x[k]);
-					if (j==1)
-						suma += 2 * P3(x[k]) * P1(x[k]);
-					if (j==2)
-						suma += 2 * P3(x[k]) * P2(x[k]);
-					if (j==3)
-						suma += 2 * P3(x[k]) * P3(x[k]);
-				}
-				
+				suma += wartosc (i, j, x[k]);
 			}
 			add_to_entry_matrix(eqs, j, i, suma);
 		}	
@@ -100,12 +52,8 @@ make_spl (points_t * pts, spline_t * spl)
 		{
 			if (j==0)
 				suma += y[k];
-			if (j==1)
-				suma += 2 * y[k] * P1(x[k]);
-			if (j==2)
-				suma += 2 * y[k] * P2(x[k]);
-			if (j==3)
-				suma += 2 * y[k] * P3(x[k]);
+			else 
+				suma += 2 * y[k] * P ( j, x[k] );
 		}
 		add_to_entry_matrix(eqs, j, nb, suma);
 	}
@@ -126,7 +74,7 @@ make_spl (points_t * pts, spline_t * spl)
 		
 		xx = spl->x[0] = pts->x[0];
 		
-		spl->f[0] = 2*a0 + a1*P1(xx) + a2*P2(xx) + a3*P3(xx);
+		spl->f[0] = 2*a0 + a1*P(1, xx) + a2*P(2, xx) + a3*P(3, xx);
 		spl->f1[0] = 3 * ( xx * a2 + a3 * (5 * xx * xx - 1) / 2 );
 		spl->f2[0] = 3 * ( a2 + 5 * a3 * xx );
 		spl->f3[0] = 15 * a3;
